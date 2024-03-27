@@ -4,6 +4,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveController;
 use App\Models\LeaveMaster;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DropdownController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,10 @@ Route::get('/', function () {
 });
 
 Auth::routes();
+
+Route::get('/countries', [DropdownController::class, 'index']);
+Route::get('/states/{id}', [DropdownController::class, 'getStates']);
+Route::get('/cities/{id}', [DropdownController::class, 'getCities']);
 Route::post('/submit-leave-request', [EmployeeController::class, 'storeLeave'])->name('submitLeaveRequest');
 Route::get('/leave-request', [App\Http\Controllers\HomeController::class, 'leaveRequest'])->name('leaveRequest');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

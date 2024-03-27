@@ -109,11 +109,16 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="country" class="col-md-4 col-form-label text-md-end">{{ __('Country') }}</label>
-
+                            <label for="countries" class="col-md-4 col-form-label text-md-end">{{ __('Country') }}</label>
                             <div class="col-md-6">
-                                <input id="country" type="text" class="form-control @error('country') is-invalid @enderror" name="country" value="{{ old('country') }}" required>
 
+                                <select class="form-select" id="country" name="country" required>
+                                    <option value="">Select Country</option>
+                                    <!-- Populate options dynamically from countries table -->
+                                    @foreach($countries as $country)
+                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
                                 @error('country')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -124,10 +129,10 @@
 
                         <div class="row mb-3">
                             <label for="state" class="col-md-4 col-form-label text-md-end">{{ __('State') }}</label>
-
                             <div class="col-md-6">
-                                <input id="state" type="text" class="form-control @error('state') is-invalid @enderror" name="state" value="{{ old('state') }}" required>
-
+                                <select id="state" class="form-select @error('state') is-invalid @enderror" name="state" required>
+                                    <option value="">Select State</option>
+                                </select>
                                 @error('state')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -138,10 +143,10 @@
 
                         <div class="row mb-3">
                             <label for="city" class="col-md-4 col-form-label text-md-end">{{ __('City') }}</label>
-
                             <div class="col-md-6">
-                                <input id="city" type="text" class="form-control @error('city') is-invalid @enderror" name="city" value="{{ old('city') }}" required>
-
+                                <select id="city" class="form-select @error('city') is-invalid @enderror" name="city" required>
+                                    <option value="">Select City</option>
+                                </select>
                                 @error('city')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -203,4 +208,45 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const countrySelect = document.getElementById('country');
+        const stateSelect = document.getElementById('state');
+        const citySelect = document.getElementById('city');
+
+        // Function to fetch and populate cities based on the selected state
+        function populateCities(stateId) {
+            fetch(`/cities/${stateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    citySelect.innerHTML = '<option value="">Select City</option>';
+                    data.forEach(city => {
+                        citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
+                    });
+                });
+        }
+
+        // Event listener for country dropdown
+        countrySelect.addEventListener('change', function() {
+            const countryId = this.value;
+
+            fetch(`/states/${countryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    stateSelect.innerHTML = '<option value="">Select State</option>';
+                    data.forEach(state => {
+                        stateSelect.innerHTML += `<option value="${state.id}">${state.name}</option>`;
+                    });
+                });
+        });
+
+        // Event listener for state dropdown
+        stateSelect.addEventListener('change', function() {
+            const stateId = this.value;
+            populateCities(stateId); // Call the function to populate cities
+        });
+    });
+</script>
+
+
 @endsection
